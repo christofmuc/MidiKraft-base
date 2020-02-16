@@ -58,7 +58,7 @@ namespace midikraft {
 		return instance_;
 	}
 
-	void MidiController::logMidiMessage(const MidiMessage& message, const String& source, bool isOut) {
+	void MidiController::logMidiMessage(const GenericMidiMessage& message, const String& source, bool isOut) {
 		if (midiLogFunction_) {
 			midiLogFunction_(message, source, isOut);
 		}
@@ -84,7 +84,7 @@ namespace midikraft {
 		return false;
 	}
 
-	void MidiController::setMidiLogFunction(std::function<void(const MidiMessage& message, const String& source, bool isOut)> logFunction) {
+	void MidiController::setMidiLogFunction(std::function<void(const GenericMidiMessage& message, const String& source, bool isOut)> logFunction) {
 		midiLogFunction_ = logFunction;
 	}
 
@@ -127,10 +127,23 @@ namespace midikraft {
 
 	// These methods handle callbacks from the midi device
 	void MidiController::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message) {
+		std::string sourceName = source->getName().toStdString();
+
 		if (!message.isActiveSense() && !message.isMidiClock()) {
 			logMidiMessage(message, source->getName(), false);
 		}
 
+		// See if this is part of an NRPN message
+		if (nrpnDetection_.find(sourceName) == nrpnDetection_.end()) {
+			nrpnDetection_[sourceName] = MidiRPNDetector();
+		}
+		if (message.isController()) {
+			MidiRPNMessage result;
+			if (nrpnDetection_[sourceName].parseControllerMessage(message.getChannel(), message.getControllerNumber(), message.getControllerValue(), result)) {
+				logMidiMessage(result, source->getName(), false);
+			}
+		}
+		
 		// Call all currently registered handlers, but make sure to iterate over a copy of the list as it might get modified while the handlers run
 		// First the new style handlers;
 		std::vector < std::function<void(MidiInput *, MidiMessage const &)>> newhandlers;

@@ -29,6 +29,21 @@ namespace midikraft {
 		MidiController *controller_;
 	};
 
+	class GenericMidiMessage {
+	public:
+		GenericMidiMessage(MidiMessage const &message) : isRPN_(false), message_(message) {}
+		GenericMidiMessage(MidiRPNMessage const &message) : isRPN_(true), rpnMessage_(message) {};
+
+		bool isNormal() const { return !isRPN_;  }
+		MidiMessage midiMessage() const { return message_; };
+		MidiRPNMessage nrpn() const { return rpnMessage_;  }
+
+	private:
+		bool isRPN_;
+		MidiMessage message_;
+		MidiRPNMessage rpnMessage_;
+	};
+
 	class MidiController : public MidiInputCallback
 	{
 	public:
@@ -45,8 +60,8 @@ namespace midikraft {
 		void addMessageHandler(HandlerHandle const &handle, MidiCallback handler);
 		bool removeMessageHandler(HandlerHandle const &handle);
 
-		void setMidiLogFunction(std::function<void(const MidiMessage& message, const String& source, bool)>);
-		void logMidiMessage(const MidiMessage& message, const String& source, bool isOut);
+		void setMidiLogFunction(std::function<void(const GenericMidiMessage& message, const String& source, bool)>);
+		void logMidiMessage(const GenericMidiMessage& message, const String& source, bool isOut);
 
 		bool enableMidiOutput(std::string const &newOutput);
 		SafeMidiOutput *getMidiOutput(std::string const &name);
@@ -63,7 +78,8 @@ namespace midikraft {
 		std::map< std::string, std::unique_ptr<MidiOutput>> outputsOpen_;
 		std::map< std::string, SafeMidiOutput *> safeOutputs_;
 		std::map< std::string, MidiInputCallback *>  callbacks_;
-		std::function<void(const MidiMessage& message, const String& source, bool)> midiLogFunction_;
+		std::map< std::string, MidiRPNDetector> nrpnDetection_;
+		std::function<void(const GenericMidiMessage& message, const String& source, bool)> midiLogFunction_;
 	};
 	
 }
