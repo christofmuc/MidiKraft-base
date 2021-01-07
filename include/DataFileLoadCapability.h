@@ -19,12 +19,19 @@ namespace midikraft {
 			bool canBeRequested; // If you can't request it, it is a write-only type. For example, the Alternate Tunings of the Rev2
 			bool canBeSent;  // If you can't send the file type, it is read-only. For example, the global settings of the Rev2
 		};
+		struct DataFileImportDescription {
+			std::string description;
+			int dataTypeID;
+			int startItemNo;
+		};
 
+		virtual std::vector<DataFileDescription> dataTypeNames() const = 0;
+		virtual std::vector<DataFileImportDescription> dataFileImportChoices() const = 0;
 		virtual std::vector<MidiMessage> requestDataItem(int itemNo, int dataTypeID) = 0;
 		virtual int numberOfDataItemsPerType(int dataTypeID) const = 0;
 		virtual bool isDataFile(const MidiMessage &message, int dataTypeID) const = 0;
 		virtual std::vector<std::shared_ptr<DataFile>> loadData(std::vector<MidiMessage> messages, int dataTypeID) const = 0;
-		virtual std::vector<DataFileDescription> dataTypeNames() const = 0;
+		
 	};
 
 }
