@@ -18,7 +18,7 @@ namespace midikraft {
 	public:
 		virtual void setGlobalSettingsFromDataFile(std::shared_ptr<DataFile> dataFile) = 0;
 		virtual std::vector<std::shared_ptr<TypedNamedValue>> getGlobalSettings() = 0;
-		virtual DataFileLoadCapability *loader() = 0;
+		virtual std::shared_ptr<DataFileLoadCapability> loader() = 0;
 		virtual int settingsDataFileType() const = 0;
 	};
 
