@@ -46,15 +46,42 @@ namespace midikraft {
 			int startItemNo;
 		};
 
+		// Not sure for what the following two items are
 		virtual std::vector<DataFileDescription> dataTypeNames() const = 0;
+		virtual bool isDataFile(const MidiMessage &message, DataFileType dataTypeID) const = 0;
+
+		// This certainly is the generalized version of the StreamLoadCapability
 		virtual std::vector<DataFileImportDescription> dataFileImportChoices() const = 0;
 		virtual std::vector<MidiMessage> requestDataItem(int itemNo, DataStreamType dataStreamType) = 0;
 		virtual int numberOfMidiMessagesPerStreamType(DataStreamType dataTypeID) const = 0;
 		virtual bool isPartOfDataFileStream(const MidiMessage &message, DataStreamType dataTypeID) const = 0;
-		virtual bool isDataFile(const MidiMessage &message, DataFileType dataTypeID) const = 0;		
+		virtual bool isStreamComplete(std::vector<MidiMessage> const &messages, DataStreamType streamType) const = 0;
+		virtual bool shouldStreamAdvance(std::vector<MidiMessage> const &messages, DataStreamType streamType) const = 0;
 		virtual std::vector<std::shared_ptr<DataFile>> loadData(std::vector<MidiMessage> messages, DataStreamType dataTypeID) const = 0;
 		
 	};
 
+
+	class SingleMessageDataFileLoadCapability : public DataFileLoadCapability {
+	public:
+		virtual int numberOfMidiMessagesPerStreamType(DataStreamType dataTypeID) const override{
+			ignoreUnused(dataTypeID);
+			return 1;
+		}
+
+		virtual bool isStreamComplete(std::vector<MidiMessage> const &messages, DataStreamType streamType) const override {
+			for (auto message : messages) {
+				if (isPartOfDataFileStream(message, streamType)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		virtual bool shouldStreamAdvance(std::vector<MidiMessage> const &messages, DataStreamType streamType) const override {
+			ignoreUnused(messages, streamType);
+			return false;
+		}
+	};
 }
 
