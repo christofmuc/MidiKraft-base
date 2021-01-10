@@ -86,13 +86,10 @@ namespace midikraft {
 					std::copy(morePatches.begin(), morePatches.end(), std::back_inserter(result));
 				}
 				else if (dataFileLoadSynth) {
-					// Should test all data file types!
-					for (int dataType = 0; dataType < dataFileLoadSynth->dataTypeNames().size(); dataType++) {
-						if (dataFileLoadSynth->isDataFile(message, dataType)) {
-							// Hit, we can load this
-							auto items = dataFileLoadSynth->loadData({ message }, dataType);
-							std::copy(items.begin(), items.end(), std::back_inserter(result));
-						}
+					// Should test all data stream types!
+					for (auto dataStream : dataFileLoadSynth->dataFileImportChoices()) {
+						auto items = dataFileLoadSynth->loadData({ message }, dataStream.dataStreamID);
+						std::copy(items.begin(), items.end(), std::back_inserter(result));
 					}
 				}
 				else {

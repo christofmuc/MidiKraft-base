@@ -20,6 +20,7 @@ namespace midikraft {
 		virtual std::vector<std::shared_ptr<TypedNamedValue>> getGlobalSettings() = 0;
 		virtual std::shared_ptr<DataFileLoadCapability> loader() = 0;
 		virtual int settingsDataFileType() const = 0;
+		virtual DataFileLoadCapability::DataFileImportDescription settingsImport() const = 0;
 	};
 
 }
