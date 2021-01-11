@@ -57,6 +57,13 @@ namespace midikraft {
 			// The stream dump synth loads all at once
 			result = streamDumpSynth->loadPatchesFromStream(sysexMessages);
 		}
+		else if (dataFileLoadSynth) {
+			// Should test all data stream types!
+			for (auto dataStream : dataFileLoadSynth->dataFileImportChoices()) {
+				auto items = dataFileLoadSynth->loadData(sysexMessages, dataStream.dataStreamID);
+				std::copy(items.begin(), items.end(), std::back_inserter(result));
+			}
+		}
 		else {
 			// The other Synth types load message by message
 			for (auto message : sysexMessages) {
@@ -84,13 +91,6 @@ namespace midikraft {
 					auto morePatches = bankDumpSynth->patchesFromSysexBank(message);
 					Logger::writeToLog((boost::format("Loaded bank dump with %d patches") % morePatches.size()).str());
 					std::copy(morePatches.begin(), morePatches.end(), std::back_inserter(result));
-				}
-				else if (dataFileLoadSynth) {
-					// Should test all data stream types!
-					for (auto dataStream : dataFileLoadSynth->dataFileImportChoices()) {
-						auto items = dataFileLoadSynth->loadData({ message }, dataStream.dataStreamID);
-						std::copy(items.begin(), items.end(), std::back_inserter(result));
-					}
 				}
 				else {
 					// The way I ended up here was to load the ZIP of the Pro3 factory programs, and that includes the weird macOS resource fork
