@@ -34,13 +34,16 @@ namespace midikraft {
 
 	class DataFileLoadCapability {
 	public:
-		struct DataFileDescription {
+		class DataFileDescription {
+		public:
+			DataFileDescription(DataFileType t, std::string const &name) : dataFileID_(t), name(name) {}
+
 			DataFileType dataFileID_; // Database identifier of data file (e.g. Single, Wave, Tone)
 			std::string name; // Display name of the type
-			bool canBeRequested; // If you can't request it, it is a write-only type. For example, the Alternate Tunings of the Rev2
-			bool canBeSent;  // If you can't send the file type, it is read-only. For example, the global settings of the Rev2
 		};
 		struct DataFileImportDescription {
+			DataFileImportDescription() : startItemNo(0) {}
+			DataFileImportDescription(DataStreamType dataType, std::string const &description, int startIndex) : dataStreamID(dataType), description(description), startItemNo(startIndex) {}
 			DataStreamType dataStreamID = DataStreamType(0);
 			std::string description;
 			int startItemNo;
