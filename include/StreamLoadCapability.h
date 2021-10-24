@@ -12,6 +12,7 @@
 
 namespace midikraft {
 
+	// Deprecated - should be replaced eveywhere with the newer DataFileLoadCapability
 	class StreamLoadCapability {
 	public:
 		enum class StreamType {
