@@ -19,7 +19,6 @@ namespace midikraft {
 
 	class SendTarget;
 	class DataFile;
-	class Patch;
 
 	typedef std::vector<std::shared_ptr<DataFile>> TPatchVector;
 
@@ -48,6 +47,7 @@ namespace midikraft {
 		virtual TPatchVector loadSysex(std::vector<MidiMessage> const &sysexMessages);
 		virtual void saveSysex(std::string const &filename, std::vector<MidiMessage> messages);
 		virtual std::vector<MidiMessage> patchToSysex(std::shared_ptr<DataFile> dataFile, std::shared_ptr<SendTarget> target);
+		virtual std::string nameForPatch(std::shared_ptr<DataFile> dataFile) const;
 		virtual void sendDataFileToSynth(std::shared_ptr<DataFile> dataFile, std::shared_ptr<SendTarget> target);
 		virtual void sendBlockOfMessagesToSynth(std::string const &midiOutput, std::vector<MidiMessage> const& buffer);
 	};

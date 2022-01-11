@@ -18,6 +18,8 @@
 #include "DataFileLoadCapability.h"
 #include "DataFileSendCapability.h"
 #include "StreamLoadCapability.h"
+#include "StoredPatchNameCapability.h"
+#include "StoredPatchNumberCapability.h"
 
 #include <boost/format.hpp>
 
@@ -165,6 +167,20 @@ namespace midikraft {
 		return messages;
 	}
 
+	std::string Synth::nameForPatch(std::shared_ptr<DataFile> dataFile) const {
+		// Check if it has a stored name
+		auto storedPatchName = Capability::hasCapability<StoredPatchNameCapability>(dataFile);
+		if (storedPatchName) {
+			return storedPatchName->name();
+		}
+		// No stored patch name, but we might have a stored number
+		auto storedPatchNumber = Capability::hasCapability<StoredPatchNumberCapability>(dataFile);
+		if (storedPatchNumber && storedPatchNumber->hasStoredPatchNumber()) {
+			return friendlyProgramName(storedPatchNumber->getStoredPatchNumber());
+		}
+		return "anonymous";
+	}
+
 	void Synth::sendDataFileToSynth(std::shared_ptr<DataFile> dataFile, std::shared_ptr<SendTarget> target)
 	{
 		auto messages = patchToSysex(dataFile, target);
@@ -172,7 +188,7 @@ namespace midikraft {
 			auto midiLocation = midikraft::Capability::hasCapability<MidiLocationCapability>(this);
 			if (midiLocation && !messages.empty()) {
 				if (midiLocation->channel().isValid()) {
-					SimpleLogger::instance()->postMessage((boost::format("Sending patch %s to %s") % dataFile->name() % getName()).str());
+					SimpleLogger::instance()->postMessage((boost::format("Sending patch %s to %s") % nameForPatch(dataFile) % getName()).str());
 					MidiController::instance()->enableMidiOutput(midiLocation->midiOutput());
 					sendBlockOfMessagesToSynth(midiLocation->midiOutput(), messages);
 				}

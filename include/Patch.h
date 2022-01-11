@@ -20,8 +20,6 @@ namespace midikraft {
 
 		int dataTypeID() const;
 
-		virtual std::string name() const = 0;
-
 		// Direct byte access functions
 		void setData(Synth::PatchData const &data);
 		virtual void setDataFromSysex(MidiMessage const &message);
@@ -29,22 +27,15 @@ namespace midikraft {
 		virtual int at(int sysExIndex) const;
 		virtual void setAt(int sysExIndex, uint8 value);
 
+		// For patch comparison
+		static Synth::PatchData blankOut(std::vector<Range<int>> const& blankoutZones, Synth::PatchData const& inputData);
+
 	protected:
 		// Just any ID you want to give it
 		int dataTypeID_;
 
 		// Direct byte storage
 		Synth::PatchData data_;
-	};
-
-	class Patch : public DataFile {
-	public:
-		using DataFile::DataFile;
-
-		virtual MidiProgramNumber patchNumber() const = 0;
-
-		// For patch comparison
-		static Synth::PatchData blankOut(std::vector<Range<int>> const &blankoutZones, Synth::PatchData const &inputData);
 	};
 
 }

@@ -52,7 +52,7 @@ namespace midikraft {
 		data_[sysExIndex] = value;
 	}
 
-	Synth::PatchData Patch::blankOut(std::vector<Range<int>> const &blankoutZones, Synth::PatchData const &inputData)
+	Synth::PatchData DataFile::blankOut(std::vector<Range<int>> const &blankoutZones, Synth::PatchData const &inputData)
 	{
 		auto dataCopy = inputData;
 		for (auto blankOut : blankoutZones) {

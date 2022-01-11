@@ -10,14 +10,16 @@
 
 #include "Patch.h"
 #include "MidiTuning.h"
+#include "StoredPatchNameCapability.h"
 
 namespace midikraft {
 
-	class MTSFile : public DataFile {
+	class MTSFile : public DataFile, public StoredPatchNameCapability {
 	public:
 		MTSFile(int dataTypeID_, Synth::PatchData const &data) : DataFile(dataTypeID_, data) {}
 
-		std::string name() const override;
+		virtual std::string name() const override;
+		virtual void setName(std::string const& name) override;
 
 		std::vector<MidiMessage> createMidiMessagesFromDataFile(MidiProgramNumber placeToStore);
 
